@@ -1,9 +1,11 @@
 import sqlite3
 import datetime
+import time
 
 EBCED_DICT = {
     'a': 1, 'b': 2, 'c':3, 'd':4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 
-    'j': 10, 'k': 20, 'l': 30, 'm': 40, 'n': 50, 'o': 60, 'p': 70, 'q': 80, 'r': 90, 's': 100, 't': 200, 'u': 300, 'v': 400, 'w': 500, 'x': 600, 'y': 700, 'z': 800
+    'j': 10, 'k': 20, 'l': 30, 'm': 40, 'n': 50, 'o': 60, 'p': 70, 'q': 80, 'r': 90, 
+    's': 100, 't': 200, 'u': 300, 'v': 400, 'w': 500, 'x': 600, 'y': 700, 'z': 800
 }
 
 def runSQL(SQL, data = (), fetch = False):
@@ -52,6 +54,26 @@ def getWordList(length):
     words = runSQL("SELECT word FROM words WHERE length=?",(length,), fetch=True)
     return [wordList[0] for wordList in words]
 
+def cumilativeSum(list):
+    newList = []
+    for item in list:
+        if newList:
+            newList.append(item + newList[-1])
+        else:
+            newList.append(item)
+    return newList
+
+def printProgress(firstWord, start):
+    now = time.time()
+    timePassedInHours = round(((now - start) / 3600), 2)
+    wordIndex = runSQL('SELECT rowid FROM words WHERE word=?;', (firstWord,), fetch=True)[0][0]
+    progress = round((int(wordIndex) / 370_105), 2)
+    print(f"[COMPLETED]: {progress}% - [TIME PASSED]: {timePassedInHours} hours", end="\r")
+
+def writeResult(testCase, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number):
+    sentence = " ".join(testCase)
+    runSQL("INSERT INTO results VALUES (?, ?, ?, ?, ?, ?, ?);", (sentence, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number))
+    
 def testCaseToEbcedNumbers(testCase):
     resultList = []
     for word in testCase:
@@ -77,4 +99,22 @@ def calculatePhase4(ebcedNumberList):
     if int(testNumber) % 19 == 0:
         return testNumber
     return False
-    
+
+def calculatePhase5(ebcedNumberList):
+    testNumber = ""
+    for index, sublist in enumerate(ebcedNumberList):
+        part = str(index+1) + "".join([str(item) for item in sublist])
+        testNumber += part
+    if int(testNumber) % 19 == 0:
+        return testNumber
+    return False
+
+def calculatePhase6(ebcedNumberList):
+    testNumber = ""
+    for index, sublist in enumerate(ebcedNumberList):
+        sublist = cumilativeSum(sublist)
+        part = str(index+1) + "".join([str(item) for item in sublist])
+        testNumber += part
+    if int(testNumber) % 19 == 0:
+        return testNumber
+    return False
