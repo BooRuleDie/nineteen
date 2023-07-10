@@ -1,10 +1,12 @@
-from utils import getWordList, calculatePhase1And2, testCaseToEbcedNumbers, calculatePhase3, calculatePhase4, calculatePhase5, calculatePhase6, printProgress, cumilativeSum, writeResult
+from utils import getWordList, calculatePhase1And2, testCaseToEbcedNumbers, calculatePhase3, calculatePhase4, calculatePhase5, calculatePhase6, printProgress, cumilativeSum, writeResult, calculateTotalCalculations
 import time
 
 NUMBER = 19
 
 if __name__ == "__main__":
     numberSet = calculatePhase1And2(NUMBER) # [[1, 6, 1, 11], [3, 4, 6, 6], [5, 1, 2, 11]]
+    totalCalculations = calculateTotalCalculations(numberSet)
+    counter = 0
     start = time.time()
     
     for set in numberSet:
@@ -17,6 +19,7 @@ if __name__ == "__main__":
             for secondWordListItem in secondWordList:
                 for thirdWordListItem in thirdWordList:
                     for fourthWordListItem in fourthWordList:
+                        counter += 1
                         testCase = [
                             firstWordListItem,
                             secondWordListItem,
@@ -36,6 +39,6 @@ if __name__ == "__main__":
                         
                         if phase3Number and phase4Number and phase5Number and phase6Number:
                             writeResult(testCase, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number)
-                            printProgress(testCase[0], start)
+                            printProgress(start, totalCalculations, counter)
                         
                         

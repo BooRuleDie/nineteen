@@ -63,12 +63,22 @@ def cumilativeSum(list):
             newList.append(item)
     return newList
 
-def printProgress(firstWord, start):
+def printProgress(start, totalCalculations, counter):
     now = time.time()
     timePassedInHours = round(((now - start) / 3600), 2)
-    wordIndex = runSQL('SELECT rowid FROM words WHERE word=?;', (firstWord,), fetch=True)[0][0]
-    progress = round((int(wordIndex) / 370_105), 2)
+    progress = round((counter / totalCalculations), 2)
     print(f"[COMPLETED]: {progress}% - [TIME PASSED]: {timePassedInHours} hours", end="\r")
+
+def calculateTotalCalculations(numberSet):
+    # [[1, 6, 1, 11], [3, 4, 6, 6], [5, 1, 2, 11]]
+    totalCalculations = 0
+    for set in numberSet:
+        product = 1
+        for index in range(4):
+            product *= len(getWordList(set[index]))
+        totalCalculations += product
+    return totalCalculations
+        
 
 def writeResult(testCase, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number):
     sentence = " ".join(testCase)
