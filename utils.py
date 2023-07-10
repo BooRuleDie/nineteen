@@ -3,18 +3,19 @@ import datetime
 import time
 
 EBCED_DICT = {
-    'a': 1, 'b': 2, 'c':3, 'd':4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 
-    'j': 10, 'k': 20, 'l': 30, 'm': 40, 'n': 50, 'o': 60, 'p': 70, 'q': 80, 'r': 90, 
+    'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9,
+    'j': 10, 'k': 20, 'l': 30, 'm': 40, 'n': 50, 'o': 60, 'p': 70, 'q': 80, 'r': 90,
     's': 100, 't': 200, 'u': 300, 'v': 400, 'w': 500, 'x': 600, 'y': 700, 'z': 800
 }
 
-def runSQL(SQL, data = (), fetch = False):
+
+def runSQL(SQL, data=(), fetch=False):
     try:
         # writing credentials to the database
         conn = sqlite3.connect('english_words.db')
-        cursor = conn.cursor()        
+        cursor = conn.cursor()
         cursor.execute(SQL, data)
-        
+
         if fetch:
             result = cursor.fetchall()
             return result
@@ -31,30 +32,38 @@ def runSQL(SQL, data = (), fetch = False):
         cursor.close()
         conn.close()
 
+
 def calculatePhase1And2(NUMBER):
     phase1List = []
     for firstNumber in range(1, NUMBER - 2):
         for secondNumber in range(1, NUMBER - firstNumber - 1):
             for thirdNumber in range(1, NUMBER - firstNumber - secondNumber):
                 fourthNumber = NUMBER - firstNumber - secondNumber - thirdNumber
-                
-                numberSet1 = [firstNumber, secondNumber, thirdNumber, fourthNumber]
-                numberSet2 = [firstNumber, firstNumber + secondNumber, NUMBER - fourthNumber, NUMBER]
-                
-                phase1Number = int(f"1{numberSet1[0]}2{numberSet1[1]}3{numberSet1[2]}4{numberSet1[3]}")
-                phase2Number = int(f"1{numberSet2[0]}2{numberSet2[1]}3{numberSet2[2]}4{numberSet2[3]}")
+
+                numberSet1 = [firstNumber, secondNumber,
+                              thirdNumber, fourthNumber]
+                numberSet2 = [firstNumber, firstNumber +
+                              secondNumber, NUMBER - fourthNumber, NUMBER]
+
+                phase1Number = int(
+                    f"1{numberSet1[0]}2{numberSet1[1]}3{numberSet1[2]}4{numberSet1[3]}")
+                phase2Number = int(
+                    f"1{numberSet2[0]}2{numberSet2[1]}3{numberSet2[2]}4{numberSet2[3]}")
 
                 phase1And2 = phase1Number % NUMBER == 0 and phase2Number % NUMBER == 0
-                
+
                 if phase1And2:
                     phase1List.append(numberSet1)
     return phase1List
 
+
 def getWordList(length):
-    words = runSQL("SELECT word FROM words WHERE length=?",(length,), fetch=True)
+    words = runSQL("SELECT word FROM words WHERE length=?",
+                   (length,), fetch=True)
     return [wordList[0] for wordList in words]
 
-def cumilativeSum(list):
+
+def cumulativeSum(list):
     newList = []
     for item in list:
         if newList:
@@ -63,11 +72,14 @@ def cumilativeSum(list):
             newList.append(item)
     return newList
 
+
 def printProgress(start, totalCalculations, counter):
     now = time.time()
     timePassedInHours = round(((now - start) / 3600), 2)
     progress = round((counter / totalCalculations), 2)
-    print(f"[COMPLETED]: {progress}% - [TIME PASSED]: {timePassedInHours} hours", end="\r")
+    print(
+        f"[COMPLETED]: {progress}% - [TIME PASSED]: {timePassedInHours} hours", end="\r")
+
 
 def calculateTotalCalculations(numberSet):
     # [[1, 6, 1, 11], [3, 4, 6, 6], [5, 1, 2, 11]]
@@ -78,12 +90,14 @@ def calculateTotalCalculations(numberSet):
             product *= len(getWordList(set[index]))
         totalCalculations += product
     return totalCalculations
-        
+
 
 def writeResult(testCase, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number):
     sentence = " ".join(testCase)
-    runSQL("INSERT INTO results VALUES (?, ?, ?, ?, ?, ?, ?);", (sentence, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number))
-    
+    runSQL("INSERT INTO results VALUES (?, ?, ?, ?, ?, ?, ?);", (sentence, phase1Number,
+           phase2Number, phase3Number, phase4Number, phase5Number, phase6Number))
+
+
 def testCaseToEbcedNumbers(testCase):
     resultList = []
     for word in testCase:
@@ -93,11 +107,13 @@ def testCaseToEbcedNumbers(testCase):
         resultList.append(l)
     return resultList
 
+
 def calculatePhase3(ebcedNumberList):
     testNumber = f"1{sum(ebcedNumberList[0])}2{sum(ebcedNumberList[1])}3{sum(ebcedNumberList[2])}4{sum(ebcedNumberList[3])}"
     if int(testNumber) % 19 == 0:
         return testNumber
     return False
+
 
 def calculatePhase4(ebcedNumberList):
     firstPart = sum(ebcedNumberList[0])
@@ -110,6 +126,7 @@ def calculatePhase4(ebcedNumberList):
         return testNumber
     return False
 
+
 def calculatePhase5(ebcedNumberList):
     testNumber = ""
     for index, sublist in enumerate(ebcedNumberList):
@@ -119,10 +136,11 @@ def calculatePhase5(ebcedNumberList):
         return testNumber
     return False
 
+
 def calculatePhase6(ebcedNumberList):
     testNumber = ""
     for index, sublist in enumerate(ebcedNumberList):
-        sublist = cumilativeSum(sublist)
+        sublist = cumulativeSum(sublist)
         part = str(index+1) + "".join([str(item) for item in sublist])
         testNumber += part
     if int(testNumber) % 19 == 0:
