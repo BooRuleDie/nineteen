@@ -3,16 +3,39 @@ import datetime
 import time
 
 EBCED_DICT = {
-    'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9,
-    'j': 10, 'k': 20, 'l': 30, 'm': 40, 'n': 50, 'o': 60, 'p': 70, 'q': 80, 'r': 90,
-    's': 100, 't': 200, 'u': 300, 'v': 400, 'w': 500, 'x': 600, 'y': 700, 'z': 800
+    "a": 1,
+    "b": 2,
+    "c": 3,
+    "d": 4,
+    "e": 5,
+    "f": 6,
+    "g": 7,
+    "h": 8,
+    "i": 9,
+    "j": 10,
+    "k": 20,
+    "l": 30,
+    "m": 40,
+    "n": 50,
+    "o": 60,
+    "p": 70,
+    "q": 80,
+    "r": 90,
+    "s": 100,
+    "t": 200,
+    "u": 300,
+    "v": 400,
+    "w": 500,
+    "x": 600,
+    "y": 700,
+    "z": 800,
 }
 
 
 def runSQL(SQL, data=(), fetch=False):
     try:
         # writing credentials to the database
-        conn = sqlite3.connect('english_words.db')
+        conn = sqlite3.connect("english_words.db")
         cursor = conn.cursor()
         cursor.execute(SQL, data)
 
@@ -24,9 +47,9 @@ def runSQL(SQL, data=(), fetch=False):
 
     except sqlite3.Error as e:
         # if there is an error keep it in the errors.log
-        now = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-        with open('errors.log', 'a') as f:
-            f.write(now + ': ' + str(e) + '\n\n')
+        now = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        with open("errors.log", "a") as f:
+            f.write(now + ": " + str(e) + "\n\n")
 
     finally:
         cursor.close()
@@ -40,15 +63,20 @@ def calculatePhase1And2(NUMBER):
             for thirdNumber in range(1, NUMBER - firstNumber - secondNumber):
                 fourthNumber = NUMBER - firstNumber - secondNumber - thirdNumber
 
-                numberSet1 = [firstNumber, secondNumber,
-                              thirdNumber, fourthNumber]
-                numberSet2 = [firstNumber, firstNumber +
-                              secondNumber, NUMBER - fourthNumber, NUMBER]
+                numberSet1 = [firstNumber, secondNumber, thirdNumber, fourthNumber]
+                numberSet2 = [
+                    firstNumber,
+                    firstNumber + secondNumber,
+                    NUMBER - fourthNumber,
+                    NUMBER,
+                ]
 
                 phase1Number = int(
-                    f"1{numberSet1[0]}2{numberSet1[1]}3{numberSet1[2]}4{numberSet1[3]}")
+                    f"1{numberSet1[0]}2{numberSet1[1]}3{numberSet1[2]}4{numberSet1[3]}"
+                )
                 phase2Number = int(
-                    f"1{numberSet2[0]}2{numberSet2[1]}3{numberSet2[2]}4{numberSet2[3]}")
+                    f"1{numberSet2[0]}2{numberSet2[1]}3{numberSet2[2]}4{numberSet2[3]}"
+                )
 
                 phase1And2 = phase1Number % NUMBER == 0 and phase2Number % NUMBER == 0
 
@@ -58,8 +86,7 @@ def calculatePhase1And2(NUMBER):
 
 
 def getWordList(length):
-    words = runSQL("SELECT word FROM words WHERE length=?",
-                   (length,), fetch=True)
+    words = runSQL("SELECT word FROM words WHERE length=?", (length,), fetch=True)
     return [wordList[0] for wordList in words]
 
 
@@ -78,7 +105,8 @@ def printProgress(start, totalCalculations, counter):
     timePassedInHours = round(((now - start) / 3600), 2)
     progress = round((counter / totalCalculations), 2)
     print(
-        f"[COMPLETED]: {progress}% - [TIME PASSED]: {timePassedInHours} hours", end="\r")
+        f"[COMPLETED]: {progress}% - [TIME PASSED]: {timePassedInHours} hours", end="\r"
+    )
 
 
 def calculateTotalCalculations(numberSet):
@@ -92,10 +120,28 @@ def calculateTotalCalculations(numberSet):
     return totalCalculations
 
 
-def writeResult(testCase, phase1Number, phase2Number, phase3Number, phase4Number, phase5Number, phase6Number):
+def writeResult(
+    testCase,
+    phase1Number,
+    phase2Number,
+    phase3Number,
+    phase4Number,
+    phase5Number,
+    phase6Number,
+):
     sentence = " ".join(testCase)
-    runSQL("INSERT INTO results VALUES (?, ?, ?, ?, ?, ?, ?);", (sentence, phase1Number,
-           phase2Number, phase3Number, phase4Number, phase5Number, phase6Number))
+    runSQL(
+        "INSERT INTO results VALUES (?, ?, ?, ?, ?, ?, ?);",
+        (
+            sentence,
+            phase1Number,
+            phase2Number,
+            phase3Number,
+            phase4Number,
+            phase5Number,
+            phase6Number,
+        ),
+    )
 
 
 def testCaseToEbcedNumbers(testCase):
@@ -130,7 +176,7 @@ def calculatePhase4(ebcedNumberList):
 def calculatePhase5(ebcedNumberList):
     testNumber = ""
     for index, sublist in enumerate(ebcedNumberList):
-        part = str(index+1) + "".join([str(item) for item in sublist])
+        part = str(index + 1) + "".join([str(item) for item in sublist])
         testNumber += part
     if int(testNumber) % 19 == 0:
         return testNumber
@@ -141,7 +187,7 @@ def calculatePhase6(ebcedNumberList):
     testNumber = ""
     for index, sublist in enumerate(ebcedNumberList):
         sublist = cumulativeSum(sublist)
-        part = str(index+1) + "".join([str(item) for item in sublist])
+        part = str(index + 1) + "".join([str(item) for item in sublist])
         testNumber += part
     if int(testNumber) % 19 == 0:
         return testNumber

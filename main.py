@@ -1,4 +1,16 @@
-from utils import getWordList, calculatePhase1And2, testCaseToEbcedNumbers, calculatePhase3, calculatePhase4, calculatePhase5, calculatePhase6, printProgress, cumulativeSum, writeResult, calculateTotalCalculations
+from utils import (
+    getWordList,
+    calculatePhase1And2,
+    testCaseToEbcedNumbers,
+    calculatePhase3,
+    calculatePhase4,
+    calculatePhase5,
+    calculatePhase6,
+    printProgress,
+    cumulativeSum,
+    writeResult,
+    calculateTotalCalculations,
+)
 import time
 
 NUMBER = 19
@@ -21,8 +33,12 @@ if __name__ == "__main__":
                 for thirdWordListItem in thirdWordList:
                     for fourthWordListItem in fourthWordList:
                         counter += 1
-                        testCase = [firstWordListItem, secondWordListItem,
-                                    thirdWordListItem, fourthWordListItem]
+                        testCase = [
+                            firstWordListItem,
+                            secondWordListItem,
+                            thirdWordListItem,
+                            fourthWordListItem,
+                        ]
 
                         ebcedNumberList = testCaseToEbcedNumbers(testCase)
 
@@ -34,7 +50,19 @@ if __name__ == "__main__":
                         phase5Number = calculatePhase5(ebcedNumberList)
                         phase6Number = calculatePhase6(ebcedNumberList)
 
-                        if phase3Number and phase4Number and phase5Number and phase6Number:
-                            writeResult(testCase, phase1Number, phase2Number,
-                                        phase3Number, phase4Number, phase5Number, phase6Number)
+                        if (
+                            phase3Number
+                            and phase4Number
+                            and phase5Number
+                            and phase6Number
+                        ):
+                            writeResult(
+                                testCase,
+                                phase1Number,
+                                phase2Number,
+                                phase3Number,
+                                phase4Number,
+                                phase5Number,
+                                phase6Number,
+                            )
                             printProgress(start, totalCalculations, counter)
